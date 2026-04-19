@@ -7,8 +7,68 @@ import requests
 import time
 from difflib import SequenceMatcher
 
-DEBUG=0
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+DEBUG=1
 PREVIEW_DURATION = 30   # seconds; up to 30
+
+COLOURS = {
+    "bg":         (15,  15,  20),   # near-black
+    "button_bg":  (30,  30,  40),   # dark card
+    "button_border": (80, 80, 110), # muted purple-grey
+    "button_hover":  (50, 50, 70),  # slightly lighter on hover
+    "accent":     (220, 60, 120),   # hot pink accent
+    "text_main":  (240, 240, 255),  # off-white
+    "text_dim":   (140, 140, 160),  # muted
+    "correct":    (40,  200, 120),
+    "incorrect":  (220, 60,  60),
+}
+
+FONT_PATH_REGULAR = "fonts/Outfit-Regular.ttf"
+FONT_PATH_BOLD    = "fonts/Outfit-Bold.ttf"
+
+def display_buttons_result(buttons, correct, guessed):
+    button_width  = screen_width - 80
+    button_height = 80
+    button_gap    = 14
+    total_height  = len(buttons) * (button_height + button_gap) - button_gap
+    start_y       = 80
+
+    for i, option in enumerate(buttons):
+        x = 40
+        y = start_y + i * (button_height + button_gap)
+        rect = pygame.Rect(x, y, button_width, button_height)
+
+        if option == correct:
+            bg_color     = (20, 80, 50)
+            border_color = COLOURS["correct"]
+            bar_color    = COLOURS["correct"]
+        elif option == guessed:
+            bg_color     = (80, 20, 20)
+            border_color = COLOURS["incorrect"]
+            bar_color    = COLOURS["incorrect"]
+        else:
+            bg_color     = COLOURS["button_bg"]
+            border_color = COLOURS["button_border"]
+            bar_color    = COLOURS["accent"]
+
+        pygame.draw.rect(screen, bg_color, rect, border_radius=12)
+        pygame.draw.rect(screen, border_color, rect, width=2, border_radius=12)
+        bar_rect = pygame.Rect(x, y + 16, 4, button_height - 32)
+        pygame.draw.rect(screen, bar_color, bar_rect, border_radius=2)
+
+        if " — " in option:
+            artist, title = option.split(" — ", 1)
+        else:
+            artist, title = option, ""
+
+        artist_font = pygame.font.SysFont("freesans", 20)
+        artist_surf = artist_font.render(artist, True, COLOURS["text_dim"])
+        screen.blit(artist_surf, (x + 22, y + 16))
+
+        title_font = pygame.font.SysFont("freesans", 26)
+        title_surf = title_font.render(title, True, COLOURS["text_main"])
+        screen.blit(title_surf, (x + 22, y + 38))
 
 # Initialize Pygame
 pygame.init()
@@ -20,49 +80,63 @@ screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Song Quiz")
 
-def similar(a, b):
-    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+def fetch_preview_for_song(song):
+    time.sleep(random.uniform(0.1, 0.3))    # to try not to hammer deezer too hard
+    song["preview"] = get_deezer_preview(song["artist"], song["title"])
+    return song
+
+def prefetch_previews(songs, screen):
+    # Loading screen
+    screen.fill(COLOURS["bg"])
+    display_text("Loading songs...", None, 40, COLOURS["text_main"], screen_width // 2, 250)
+    pygame.display.update()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = {executor.submit(fetch_preview_for_song, song): song for song in songs}
+        completed = 0
+        for future in as_completed(futures):
+            future.result()
+            completed += 1
+            pygame.event.pump()   # keep OS happy
+            screen.fill(COLOURS["bg"])
+            display_text("Loading songs...", None, 40, COLOURS["text_main"], screen_width // 2, 220)
+            display_text(f"{completed} / {len(songs)}", None, 32, COLOURS["text_dim"], screen_width // 2, 280)
+            pygame.display.update()
+
+def check_network():
+    try:
+        requests.get("https://api.deezer.com", timeout=5)
+        return True
+    except requests.exceptions.ConnectionError:
+        return False
 
 def get_deezer_preview(artist, title):
-    if DEBUG:
-        print(f"Searching Deezer for: {artist} — {title}")
+    """
+    Look up a Deezer preview URL for the given artist and title.
+    Returns the preview URL string, or None if nothing usable was found.
+    """
+    try:
+        query = f'artist:"{artist}" track:"{title}"'
+        url = f"https://api.deezer.com/search?q={requests.utils.quote(query)}"
+        data = requests.get(url, timeout=10).json()
+        if "data" not in data:
+            print(f"Unexpected response for {artist} - {title}: {data}")
+            return None
 
-    query = f'artist:"{artist}" track:"{title}"'
-    url = f"https://api.deezer.com/search?q={requests.utils.quote(query)}"
-
-    response = requests.get(url)
-    data = response.json()
-
-    if DEBUG:
-        print(f"Deezer returned total={data.get('total')} results")
-
-    if data["total"] > 0:
         for result in data["data"]:
-            deezer_artist = result["artist"]["name"]
-            deezer_title = result["title"]
-            has_preview = bool(result["preview"])
-
-            if DEBUG:
-                print(f"Checking: '{deezer_artist}' — '{deezer_title}' (preview={has_preview})")
-
-            artist_match = similar(artist, deezer_artist) > 0.6
-            title_match = similar(title, deezer_title) > 0.6
-
-            if DEBUG:
-                print(f"  artist_match={artist_match}, title_match={title_match}")
-
-            if artist_match and title_match and has_preview:
+            if result["preview"]:
                 return result["preview"]
 
-        if DEBUG:
-            print("No matching result with preview")
-    else:
-        if DEBUG:
-            print("No results found at all")
-
+    except requests.exceptions.ConnectionError:
+        print(f"Network error looking up: {artist} - {title}")
+        exit()
+    except requests.exceptions.Timeout:
+        print(f"Timed out looking up: {artist} - {title}")
+        exit()
     return None
 
-def play_song(preview_url, duration, button_rects, song_name):
+
+def play_song(preview_url, duration, button_rects, song_name, question, total_questions):
     response = requests.get(preview_url)
     audio_data = io.BytesIO(response.content)
     pygame.mixer.music.load(audio_data)
@@ -71,58 +145,56 @@ def play_song(preview_url, duration, button_rects, song_name):
     offset = random.uniform(5.0, 30.0)
     if DEBUG:
         print(f"Using offset {offset}")
-    pygame.mixer.music.play(start=offset)   # start at a random point. this should make it easier, for songs with long intros etc
-
-    # Update UI
-    message_rect = pygame.Rect(0, 140, screen_width, 60)
-    pygame.draw.rect(screen, (255, 255, 255), message_rect)
-    display_text("Mystery song is playing...", None, 32, (0, 0, 255), screen_width // 2, 170)
-    pygame.display.update(message_rect)
+    pygame.mixer.music.play(start=offset)
 
     start_time = time.time()
-   
     guessed_option = None
+    buttons = list(button_rects.keys())
 
     while True:
         elapsed = time.time() - start_time
         remaining = int(duration - elapsed)
-
         if remaining < 0:
             break
 
+        mouse_pos = pygame.mouse.get_pos()
+        hovered = next((opt for opt, r in button_rects.items() if r.collidepoint(mouse_pos)), None)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                pygame.quit(); exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    exit()
-
+                    pygame.quit(); exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for option, rect in button_rects.items():
                     if rect.collidepoint(event.pos):
-                        guessed_option = option
                         pygame.mixer.music.stop()
-                        return guessed_option 
+                        return option
 
-        # Clear only the countdown area
-        countdown_rect = pygame.Rect(screen_width // 2 - 50, 470, 100, 60)
-        pygame.draw.rect(screen, (255, 255, 255), countdown_rect)
+        # Redraw
+        screen.fill(COLOURS["bg"])
+        display_text(f"Question {question} of {total_questions}", None, 28, COLOURS["text_dim"], screen_width // 2, 40)
+        button_rects = display_buttons(buttons, hovered=hovered)
 
-        # Draw countdown number
-        display_text(f"{remaining}", None, 60, (255, 0, 0), screen_width // 2, 500)
+        button_height = 80
+        button_gap    = 14
+        total_height  = 4 * (button_height + button_gap) - button_gap
+        last_button_bottom = 80 + total_height
+        countdown_y = last_button_bottom + (screen_height - last_button_bottom) // 2
+
+        # Countdown at the bottom, cleared each frame by the fill above
+        display_text(f"{remaining}", None, 52, COLOURS["accent"], screen_width // 2, countdown_y)
 
         pygame.display.update()
-        time.sleep(0.1)
+        time.sleep(0.05)
 
     pygame.mixer.music.stop()
-    return guessed_option
+    return None
 
-def display_text(text, font=None, size=36, color=(0, 0, 255), x=0, y=0, align="center"):
+def display_text(text, font=None, size=36, color=COLOURS["text_main"], x=0, y=0, align="center"):
     if font is None:
-        font = pygame.font.match_font("freesans")
-
+        font = FONT_PATH_BOLD
     font = pygame.font.Font(font, size)
     text_surface = font.render(text, True, color)
     if align == "center":
@@ -131,36 +203,58 @@ def display_text(text, font=None, size=36, color=(0, 0, 255), x=0, y=0, align="c
         text_rect = text_surface.get_rect(topright=(x, y))
     screen.blit(text_surface, text_rect)
 
-def display_buttons(buttons):
-    button_font = pygame.font.SysFont(None, 30)
-    button_width =  260
-    button_height = 70
-    button_gap_x =  30
-    button_gap_y =  25
-    button_x = (screen_width - (2 * button_width + button_gap_x)) // 2
-    button_rects = {}  
+def display_buttons(buttons, hovered=None):
+    button_width  = screen_width - 80          # nearly full width
+    button_height = 80
+    button_gap    = 14
+    total_height  = len(buttons) * (button_height + button_gap) - button_gap
+    start_y       = 80
+
+    button_rects = {}
 
     for i, option in enumerate(buttons):
-        button_row = i // 2
-        button_col = i % 2
-        button_y = 200 + button_row * (button_height + button_gap_y)
-        button_rect = pygame.Rect(button_x + button_col * (button_width + button_gap_x), button_y, button_width, button_height)
-        pygame.draw.rect(screen, (0, 0, 0), button_rect, 2)
-        
-        text = option
-        font_size = 30
-        font = pygame.font.SysFont(None, font_size)
+        x = 40
+        y = start_y + i * (button_height + button_gap)
+        rect = pygame.Rect(x, y, button_width, button_height)
 
-        # shrink font until it fits inside the button
-        while font.size(text)[0] > button_width - 20 and font_size > 14:
-            font_size -= 1
-            font = pygame.font.SysFont(None, font_size)
+        is_hovered = (option == hovered)
 
-        text_surface = font.render(text, True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=button_rect.center)
-        screen.blit(text_surface, text_rect)
+        # Background + border
+        bg_color = COLOURS["button_hover"] if is_hovered else COLOURS["button_bg"]
+        pygame.draw.rect(screen, bg_color, rect, border_radius=12)
+        border_color = COLOURS["accent"] if is_hovered else COLOURS["button_border"]
+        pygame.draw.rect(screen, border_color, rect, width=2, border_radius=12)
 
-        button_rects[option] = button_rect
+        # Accent bar on the left
+        bar_rect = pygame.Rect(x, y + 16, 4, button_height - 32)
+        pygame.draw.rect(screen, COLOURS["accent"], bar_rect, border_radius=2)
+
+        # Split "Artist — Title" onto two lines
+        if " — " in option:
+            artist, title = option.split(" — ", 1)
+        else:
+            artist, title = option, ""
+
+        # Artist name (smaller, dimmed)
+        artist_font_size = 20
+        artist_font = pygame.font.SysFont("freesans", artist_font_size)
+        while artist_font.size(artist)[0] > button_width - 60 and artist_font_size > 13:
+            artist_font_size -= 1
+            artist_font = pygame.font.SysFont("freesans", artist_font_size)
+        artist_surf = artist_font.render(artist, True, COLOURS["text_dim"])
+        screen.blit(artist_surf, (x + 22, y + 16))
+
+        # Track title (larger, bright)
+        title_font_size = 26
+        title_font = pygame.font.SysFont("freesans", title_font_size)
+        while title_font.size(title)[0] > button_width - 60 and title_font_size > 14:
+            title_font_size -= 1
+            title_font = pygame.font.SysFont("freesans", title_font_size)
+        title_surf = title_font.render(title, True, COLOURS["text_main"])
+        screen.blit(title_surf, (x + 22, y + 38))
+
+        button_rects[option] = rect
+
     return button_rects
 
 def music_quiz():
@@ -169,10 +263,24 @@ def music_quiz():
 
     with open('songs.json', 'r') as file:
         songs = json.load(file)
-        if len(songs) < 5:
-            print("Not enough songs in songs.json (need at least 5)")
-            pygame.quit()
-            exit()
+
+    if not check_network():
+        print("No network connection; exiting")
+        pygame.quit()
+        exit()
+
+    fetch_start = time.time()
+
+    # Pre-fetch all preview URLs before the quiz starts
+    #for song in songs:
+    #    song["preview"] = get_deezer_preview(song["artist"], song["title"])
+    prefetch_previews(songs, screen)
+
+    print(f"Preview fetch took {time.time() - fetch_start:.1f}s for {len(songs)} songs")
+
+    if len(songs) < 5:
+        print("Not enough songs in songs.json (need at least 5)")
+        exit()
 
     question = 0
     while question < total_questions:
@@ -184,35 +292,34 @@ def music_quiz():
         song_name = f"{song['artist']} — {song['title']}"
 
         # Get preview
-        song["preview_url"] = get_deezer_preview(song["artist"], song["title"])
-        if song["preview_url"] is None:
+        preview_url = song.get("preview")
+
+        if not preview_url:
             if DEBUG:
                 print(f"Skipping: No preview for {song_name}")
             continue
-        screen.fill((255, 255, 255))
-        display_text(f"Question {question + 1} of {total_questions}", None, 40, (0, 0, 255), screen_width // 2, 60)
+
+#        display_text(f"Question {question + 1} of {total_questions}", None, 40, (0, 0, 255), screen_width // 2, 60)
 
         buttons = [f"{s['artist']} — {s['title']}" for s in round_songs]
         button_rects = display_buttons(buttons)
         pygame.display.update()
    
         question += 1
-        guessed = play_song(song["preview_url"], PREVIEW_DURATION, button_rects, song_name)
-    
-        if guessed == song_name:
+        guessed = play_song(preview_url, PREVIEW_DURATION, button_rects, song_name, question, total_questions)
+
+        correct_name = song_name
+        result_text  = "Correct!" if guessed == correct_name else "Incorrect!"
+        result_color = COLOURS["correct"] if guessed == correct_name else COLOURS["incorrect"]
+        if guessed == correct_name:
             score += 1
-            screen.fill((255, 255, 255))
-            display_text("Correct!", None, 50, (0, 180, 0), screen_width // 2, 250)
-        else:
-            screen.fill((255, 255, 255))
-            display_text("Incorrect!", None, 50, (200, 0, 0), screen_width // 2, 220)
-            display_text(f"It was:", None, 32, (0, 0, 0), screen_width // 2, 400)
-            display_text(song_name, None, 28, (0, 0, 0), screen_width // 2, 440)
 
-        time.sleep(1)
+        screen.fill(COLOURS["bg"])
+        display_text(result_text, None, 40, result_color, screen_width // 2, 30)
+        display_text(f"{score} / {total_questions}", None, 24, COLOURS["text_dim"], screen_width // 2, 68)
+        display_buttons_result(list(button_rects.keys()), correct_name, guessed)
         pygame.display.update()
-
-    question += 1
+        time.sleep(2)
 
     # Final screen
     screen.fill((255, 255, 255))

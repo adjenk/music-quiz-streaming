@@ -1,81 +1,387 @@
 [
-  {"artist": "Emotional Oranges", "title": "West Coast Love", "genre": "R&B"},
-  {"artist": "Lola Young", "title": "Messy", "genre": "Indie Pop"},
-  {"artist": "Imelda May", "title": "Johnny Got a Boom Boom", "genre": "Rockabilly"},
-  {"artist": "Aïcha", "title": "Cheb Khaled", "genre": "Raï"},
-  {"artist": "Rachid Taha", "title": "Ya Rayah", "genre": "Raï"},
-
-  {"artist": "Becky Hill", "title": "Disconnect", "genre": "Pop"},
-  {"artist": "Becky Hill", "title": "My Heart Goes (La Di Da)", "genre": "Pop"},
-  {"artist": "Becky Hill", "title": "Remember", "genre": "Pop"},
-  {"artist": "Clean Bandit", "title": "Rockabye (feat. Sean Paul & Anne-Marie)", "genre": "Pop"},
-  {"artist": "Clean Bandit", "title": "Symphony", "genre": "Pop"},
-  {"artist": "Becky Hill & Shift K3Y", "title": "Better Off Without You", "genre": "Dance-Pop"},
-
-  {"artist": "Alex Gaudino", "title": "Body", "genre": "Dance"},
-  {"artist": "Pakito", "title": "Livin On Video (DJ Misha Gold Remix)", "genre": "Dance"},
-
-  {"artist": "TSHA", "title": "OnlyL", "genre": "House"},
-  {"artist": "D.O.D.", "title": "Paradise", "genre": "House"},
-  {"artist": "Dico Wang", "title": "Sparkle Dance", "genre": "House"},
-  {"artist": "Belters Only & Jazzy", "title": "Make Me Feel Good", "genre": "House"},
-  {"artist": "Rose Gray", "title": "Lotus", "genre": "House"},
-  {"artist": "Sander Kleinenberg & Felix Leiter", "title": "The One (Extended Mix)", "genre": "House"},
-
-  {"artist": "HI-LO & Oliver Heldens", "title": "Hypnos", "genre": "Techno"},
-  {"artist": "Amelie Lens", "title": "Follow", "genre": "Techno"},
-
-  {"artist": "Bicep", "title": "Glue", "genre": "Electronica"},
-  {"artist": "Blinkie", "title": "More Than A Feeling", "genre": "Electronic"},
-  {"artist": "What So Not", "title": "Jaguar (with BURNS)", "genre": "Electronic"},
-
-  {"artist": "Alison Wonderland", "title": "I Want U", "genre": "EDM"},
-  {"artist": "Alison Wonderland", "title": "Church", "genre": "EDM"},
-  {"artist": "Alison Wonderland", "title": "Run", "genre": "EDM"},
-  {"artist": "Alison Wonderland", "title": "Something Real", "genre": "EDM"},
-
-  {"artist": "Godlands", "title": "Better Off Alone", "genre": "Trap"},
-
-  {"artist": "Chakra", "title": "Love Shines Through", "genre": "Trance"},
-  {"artist": "Myon & Shane 54 feat. Amy Pearson", "title": "Hurricane (Vigel Remix)", "genre": "Trance"},
-  {"artist": "Armin van Buuren", "title": "Ping Pong (R3sizzer Remix)", "genre": "Trance"},
-
-  {"artist": "Flava D", "title": "Spicy Noodles", "genre": "UK Garage"},
-
-  {"artist": "Kyrist", "title": "Translation", "genre": "Drum & Bass"},
-  {"artist": "Mantra", "title": "Nocturne (Original Mix)", "genre": "Drum & Bass"},
-  {"artist": "Mollie Collins", "title": "Estate Of Mind", "genre": "Drum & Bass"},
-  {"artist": "Mollie Collins", "title": "The Boy Is Mine", "genre": "Drum & Bass"},
-  {"artist": "Mizeyesis", "title": "Warmth", "genre": "Drum & Bass"},
-  {"artist": "Mizeyesis", "title": "Ease Up Junglist", "genre": "Drum & Bass"},
-  {"artist": "Mizeyesis", "title": "The Ancients", "genre": "Drum & Bass"},
-  {"artist": "Mizeyesis", "title": "Connected Souls", "genre": "Drum & Bass"},
-  {"artist": "Sub Focus", "title": "Desire (Sub Focus x Dimension)", "genre": "Drum & Bass"},
-
-  {"artist": "Matt Nash & Felix Leiter", "title": "Heartbeats", "genre": "Progressive House"},
-  {"artist": "John Dahlbäck", "title": "Chased", "genre": "Progressive House"},
-  {"artist": "Hot Mouth", "title": "Dive (Husman Remix) [feat. Hope]", "genre": "Progressive House"},
-  {"artist": "Marnik & Lush & Simon", "title": "Orion", "genre": "Progressive House"},
-  {"artist": "Holl & Rush", "title": "Don't Know", "genre": "Progressive House"},
-
-  {"artist": "Nicky Romero", "title": "Generation 303", "genre": "Electro House"},
-  {"artist": "NJ Taylor", "title": "I Don't Care (Naeleck Remix)", "genre": "Electro House"},
-  {"artist": "Uberjakd", "title": "Hellfire", "genre": "Electro House"},
-  {"artist": "Bowery Boys feat. Michaela Paige", "title": "Turn Up The Music (Triplet Dub Mix)", "genre": "Electro House"},
-  {"artist": "FTampa & The Fish House", "title": "031", "genre": "Electro House"},
-
-  {"artist": "Maurice West", "title": "Don't You Say", "genre": "Big Room"},
-  {"artist": "Marnik & Blazars", "title": "King In The North", "genre": "Big Room"},
-  {"artist": "Ummet Ozcan & W&W", "title": "The Code", "genre": "Big Room"},
-  {"artist": "Husman & Jaxx & Vega", "title": "Venom", "genre": "Big Room"},
-  {"artist": "Tony Kart", "title": "Whistle Baby", "genre": "Big Room"},
-  {"artist": "Twoloud vs. Julian Jordan", "title": "Rockin", "genre": "Big Room"},
-  {"artist": "Ralvero & Karim Mika", "title": "Mad", "genre": "Big Room"},
-  {"artist": "Jaxx & Vega & Husman", "title": "Desperados", "genre": "Big Room"},
-  {"artist": "Blasterjaxx ft. Rosette", "title": "No Place Like Home (Castano & Maximilian Bootleg)", "genre": "Big Room"},
-  {"artist": "Sander van Doorn", "title": "Rage (with Firebeatz & Julian Jordan)", "genre": "Big Room"},
-  {"artist": "Dimitri Vegas, Like Mike & W&W", "title": "Arcade", "genre": "Big Room"},
-  {"artist": "TWIIG", "title": "Hero", "genre": "Big Room"},
-  {"artist": "Bassjackers & Reez", "title": "Rough (Extended Mix)", "genre": "Big Room"},
-  {"artist": "Ummet Ozcan & Le Shuuk", "title": "Toast Hawaii", "genre": "Big Room"}
+    {
+        "artist": "Emotional Oranges",
+        "title": "West Coast Love",
+        "genre": "R&B"
+    },
+    {
+        "artist": "Lola Young",
+        "title": "Messy",
+        "genre": "Indie Pop"
+    },
+    {
+        "artist": "Imelda May",
+        "title": "Johnny Got a Boom Boom",
+        "genre": "Rockabilly"
+    },
+    {
+        "artist": "Rachid Taha",
+        "title": "Ya Rayah",
+        "genre": "Ra\u00ef"
+    },
+    {
+        "artist": "Becky Hill",
+        "title": "Disconnect",
+        "genre": "Pop"
+    },
+    {
+        "artist": "Becky Hill",
+        "title": "My Heart Goes (La Di Da)",
+        "genre": "Pop"
+    },
+    {
+        "artist": "Becky Hill",
+        "title": "Remember",
+        "genre": "Pop"
+    },
+    {
+        "artist": "Clean Bandit",
+        "title": "Rockabye (feat. Sean Paul & Anne-Marie)",
+        "genre": "Pop"
+    },
+    {
+        "artist": "Clean Bandit",
+        "title": "Symphony",
+        "genre": "Pop"
+    },
+    {
+        "artist": "Becky Hill",
+        "title": "Better Off Without You",
+        "genre": "Future House"
+    },
+    {
+        "artist": "Alex Gaudino",
+        "title": "Body",
+        "genre": "Dance"
+    },
+    {
+        "artist": "Pakito",
+        "title": "Livin' On Video",
+        "genre": "Dance"
+    },
+    {
+        "artist": "TSHA",
+        "title": "OnlyL",
+        "genre": "House"
+    },
+    {
+        "artist": "D.O.D.",
+        "title": "Paradise",
+        "genre": "House"
+    },
+    {
+        "artist": "Dico Wang",
+        "title": "Sparkle Dance",
+        "genre": "House"
+    },
+    {
+        "artist": "Belters Only & Jazzy",
+        "title": "Make Me Feel Good",
+        "genre": "House"
+    },
+    {
+        "artist": "Rose Gray",
+        "title": "Lotus",
+        "genre": "House"
+    },
+    {
+        "artist": "Sander Kleinenberg",
+        "title": "The One (Extended Mix)",
+        "genre": "House"
+    },
+    {
+        "artist": "HI-LO & Oliver Heldens",
+        "title": "Hypnos",
+        "genre": "Techno"
+    },
+    {
+        "artist": "Amelie Lens",
+        "title": "Follow",
+        "genre": "Techno"
+    },
+    {
+        "artist": "Bicep",
+        "title": "Glue",
+        "genre": "Electronica"
+    },
+    {
+        "artist": "Blinkie",
+        "title": "More Than A Feeling",
+        "genre": "Electronic"
+    },
+    {
+        "artist": "What So Not",
+        "title": "Jaguar (with BURNS)",
+        "genre": "Electronic"
+    },
+    {
+        "artist": "Alison Wonderland",
+        "title": "I Want U",
+        "genre": "EDM"
+    },
+    {
+        "artist": "Alison Wonderland",
+        "title": "Church",
+        "genre": "EDM"
+    },
+    {
+        "artist": "Alison Wonderland",
+        "title": "Run",
+        "genre": "EDM"
+    },
+    {
+        "artist": "Alison Wonderland",
+        "title": "Something Real",
+        "genre": "EDM"
+    },
+    {
+        "artist": "Godlands",
+        "title": "Better Off Alone",
+        "genre": "Trap"
+    },
+    {
+        "artist": "Chakra",
+        "title": "Love Shines Through",
+        "genre": "Trance"
+    },
+    {
+        "artist": "Myon & Shane 54 feat. Amy Pearson",
+        "title": "Hurricane (Vigel Remix)",
+        "genre": "Trance"
+    },
+    {
+        "artist": "Armin van Buuren",
+        "title": "Ping Pong (R3sizzer Remix)",
+        "genre": "Trance"
+    },
+    {
+        "artist": "Flava D",
+        "title": "Spicy Noodles",
+        "genre": "UK Garage"
+    },
+    {
+        "artist": "Kyrist",
+        "title": "Translation",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Mantra",
+        "title": "Nocturne (Original Mix)",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Mollie Collins",
+        "title": "Estate Of Mind",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Mollie Collins",
+        "title": "The Boy Is Mine",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Mizeyesis",
+        "title": "Warmth",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Mizeyesis",
+        "title": "Ease Up Junglist",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Mizeyesis",
+        "title": "The Ancients",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Mizeyesis",
+        "title": "Connected Souls",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Sub Focus",
+        "title": "Desire (Sub Focus x Dimension)",
+        "genre": "Drum & Bass"
+    },
+    {
+        "artist": "Matt Nash & Felix Leiter",
+        "title": "Heartbeats",
+        "genre": "Progressive House"
+    },
+    {
+        "artist": "John Dahlb\u00e4ck",
+        "title": "Chased",
+        "genre": "Progressive House"
+    },
+    {
+        "artist": "Hot Mouth",
+        "title": "Dive (Husman Remix) [feat. Hope]",
+        "genre": "Progressive House"
+    },
+    {
+        "artist": "Marnik & Lush & Simon",
+        "title": "Orion",
+        "genre": "Progressive House"
+    },
+    {
+        "artist": "Holl & Rush",
+        "title": "Don't Know",
+        "genre": "Progressive House"
+    },
+    {
+        "artist": "Nicky Romero",
+        "title": "Generation 303",
+        "genre": "Electro House"
+    },
+    {
+        "artist": "NJ Taylor",
+        "title": "So You",
+        "genre": "Electro House"
+    },
+    {
+        "artist": "Uberjakd",
+        "title": "Hellfire",
+        "genre": "Electro House"
+    },
+    {
+        "artist": "Bowery Boys feat. Michaela Paige",
+        "title": "Turn Up The Music (Triplet Dub Mix)",
+        "genre": "Electro House"
+    },
+    {
+        "artist": "FTampa And The Fish House",
+        "title": "031",
+        "genre": "Electro House"
+    },
+    {
+        "artist": "Maurice West",
+        "title": "Don't You Say",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Marnik & Blazars",
+        "title": "King In The North",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Ummet Ozcan & W&W",
+        "title": "The Code",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Husman & Jaxx & Vega",
+        "title": "Venom",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Tony Kart",
+        "title": "Whistle Baby",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Twoloud vs. Julian Jordan",
+        "title": "Rockin",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Ralvero & Karim Mika",
+        "title": "Mad",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Jaxx & Vega & Husman",
+        "title": "Desperados",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Blasterjaxx ft. Rosette",
+        "title": "No Place Like Home (Castano & Maximilian Bootleg)",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Sander van Doorn",
+        "title": "Rage (with Firebeatz & Julian Jordan)",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Dimitri Vegas, Like Mike & W&W",
+        "title": "Arcade",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "TWIIG",
+        "title": "Hero",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Bassjackers & Reez",
+        "title": "Rough (Extended Mix)",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Ummet Ozcan & Le Shuuk",
+        "title": "Toast Hawaii",
+        "genre": "Big Room"
+    },
+    {
+        "artist": "Opus",
+        "title": "Live is Life",
+        "genre": "Rock"
+    },
+    {
+        "artist": "Breathe Carolina & ManyFew",
+        "title": "Dancing in the Dark",
+        "genre": "Dance"
+    },
+    {
+        "artist": "Tiësto",
+        "title": "Beautiful Places",
+        "genre": "Progressive House"
+    },
+    {
+        "artist": "aname & Lydmor",
+        "title": "Hopeful (ABGT618)",
+        "genre": "Progressive Trance"
+    },
+    {
+        "artist": "Spada & Klara Sestiniova",
+        "title": "Free Your Soul",
+        "genre": "Melodic House"
+    },
+    {
+        "artist": "Alex Warren",
+        "title": "Ordinary",
+        "genre": "Pop"
+    },
+    {
+        "artist": "DJ Casper",
+        "title": "Cha Cha Slide (Radio Edit)",
+        "genre": "Dance"
+    },
+    {
+        "artist": "Markus Schulz X Inna",
+        "title": "Nothing Without You",
+        "genre": "Progressive Trance"
+    },
+    {
+        "artist": "Albi feat. Lilly Ahlberg",
+        "title": "Sitting Down Here",
+        "genre": "Dance"
+    },
+    {
+        "artist": "W&W & Ummet Ozcan",
+        "title": "The Code",
+        "genre": "Big Room House"
+    },
+    {
+        "artist": "Tony Kart feat. Black Octopus",
+        "title": "Whistle Baby",
+        "genre": "Electro House"
+    },
+    {
+        "artist": "Sultan + Shepard",
+        "title": "Pikachew",
+        "genre": "Dance"
+    }
 ]
