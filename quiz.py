@@ -27,6 +27,64 @@ COLOURS = {
 FONT_PATH_REGULAR = "fonts/Outfit-Regular.ttf"
 FONT_PATH_BOLD    = "fonts/Outfit-Bold.ttf"
 
+def draw_menu_button(text, y):
+    button_width = 400
+    button_height = 60
+    x = (screen_width - button_width) // 2
+    rect = pygame.Rect(x, y, button_width, button_height)
+
+    pygame.draw.rect(screen, COLOURS["button_bg"], rect, border_radius=12)
+    pygame.draw.rect(screen, COLOURS["button_border"], rect, width=2, border_radius=12)
+
+    label = pygame.font.Font(FONT_PATH_BOLD, 28).render(text, True, COLOURS["text_main"])
+    label_rect = label.get_rect(center=rect.center)
+    screen.blit(label, label_rect)
+
+    return rect
+
+def cycle_questions(current, total_songs):
+    max_q = max(3, min(20, total_songs // 2))
+    options = [3, 5, 10, 15, 20]
+    options = [o for o in options if o <= max_q]
+    if current not in options:
+        return options[0]
+    idx = options.index(current)
+    return options[(idx + 1) % len(options)]
+
+def cycle_genre(current, available_genres):
+    idx = available_genres.index(current)
+    return available_genres[(idx + 1) % len(available_genres)]
+
+def main_menu(settings, songs, available_genres):
+    while True:
+        screen.fill(COLOURS["bg"])
+
+        display_text("Song Quiz", None, 60, COLOURS["accent"], screen_width // 2, 100)
+
+        start_rect     = draw_menu_button("Start Quiz", 220)
+        questions_rect = draw_menu_button(f"Questions: {settings['num_questions']}", 300)
+        genre_rect     = draw_menu_button(f"Genre: {settings['genre']}", 380)
+        quit_rect      = draw_menu_button("Quit", 460)
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit(); exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_rect.collidepoint(event.pos):
+                    return "start"
+                if quit_rect.collidepoint(event.pos):
+                    return "quit"
+                if questions_rect.collidepoint(event.pos):
+                    if settings["genre"] == "Any":
+                        available = songs
+                    else:
+                        available = [s for s in songs if s.get("genre") == settings["genre"]]
+                    settings["num_questions"] = cycle_questions(settings["num_questions"], len(available))
+                if genre_rect.collidepoint(event.pos):
+                    settings["genre"] = cycle_genre(settings["genre"], available_genres)
+
 def display_buttons_result(buttons, correct, guessed):
     button_width  = screen_width - 80
     button_height = 80
@@ -257,41 +315,46 @@ def display_buttons(buttons, hovered=None):
 
     return button_rects
 
-def music_quiz():
+def music_quiz(settings, songs):
     score = 0
-    total_questions = 3
+    total_questions = settings["num_questions"]
+    selected_genre = settings["genre"]
 
-    with open('songs.json', 'r') as file:
-        songs = json.load(file)
+    # Apply genre filter
+    filtered_songs = songs
+    if selected_genre != "Any":
+        filtered_songs = [s for s in songs if s.get("genre") == selected_genre]
+
+    if len(filtered_songs) < 4:
+        screen.fill(COLOURS["bg"])
+        display_text("Not enough songs", None, 36, COLOURS["incorrect"], screen_width // 2, 250)
+        display_text("for this genre.", None, 36, COLOURS["incorrect"], screen_width // 2, 295)
+        pygame.display.update()
+        time.sleep(2)
+        if DEBUG:
+            print(f"Not enough songs in songs.json (need at least 4 for {selected_genre}")
+        return
 
     if not check_network():
         print("No network connection; exiting")
         pygame.quit()
         exit()
 
-    fetch_start = time.time()
-
-    # Pre-fetch all preview URLs before the quiz starts
-    #for song in songs:
-    #    song["preview"] = get_deezer_preview(song["artist"], song["title"])
-    prefetch_previews(songs, screen)
-
-    print(f"Preview fetch took {time.time() - fetch_start:.1f}s for {len(songs)} songs")
-
-    if len(songs) < 5:
-        print("Not enough songs in songs.json (need at least 5)")
-        exit()
+    button_height = 80
+    button_gap    = 14
+    total_height  = 4 * (button_height + button_gap) - button_gap
+    last_button_bottom = 80 + total_height
+    countdown_y = last_button_bottom + (screen_height - last_button_bottom) // 2
 
     question = 0
-    while question < total_questions:
-        # Pick 4 unique songs
-        round_songs = random.sample(songs, 4)
 
-        # Pick one to be played
+    while question < total_questions:
+        sample_size = min(4, len(filtered_songs))
+        round_songs = random.sample(filtered_songs, sample_size)
+
         song = random.choice(round_songs)
         song_name = f"{song['artist']} — {song['title']}"
 
-        # Get preview
         preview_url = song.get("preview")
 
         if not preview_url:
@@ -299,12 +362,11 @@ def music_quiz():
                 print(f"Skipping: No preview for {song_name}")
             continue
 
-#        display_text(f"Question {question + 1} of {total_questions}", None, 40, (0, 0, 255), screen_width // 2, 60)
-
         buttons = [f"{s['artist']} — {s['title']}" for s in round_songs]
+        screen.fill(COLOURS["bg"])
         button_rects = display_buttons(buttons)
         pygame.display.update()
-   
+
         question += 1
         guessed = play_song(preview_url, PREVIEW_DURATION, button_rects, song_name, question, total_questions)
 
@@ -316,18 +378,56 @@ def music_quiz():
 
         screen.fill(COLOURS["bg"])
         display_text(result_text, None, 40, result_color, screen_width // 2, 30)
-        display_text(f"{score} / {total_questions}", None, 24, COLOURS["text_dim"], screen_width // 2, 68)
         display_buttons_result(list(button_rects.keys()), correct_name, guessed)
+#        display_text(f"{score} / {total_questions}", None, 24, COLOURS["text_dim"], screen_width // 2, countdown_y)
         pygame.display.update()
         time.sleep(2)
 
     # Final screen
-    screen.fill((255, 255, 255))
-    display_text(f"Final Score: {score} / {total_questions}", None, 50, (0, 128, 0), screen_width // 2, 250)
+    screen.fill(COLOURS["bg"])
+    display_text(f"Final Score: {score} / {total_questions}", None, 50, COLOURS["correct"], screen_width // 2, 250)
     pygame.display.update()
     time.sleep(3)
 
-    pygame.quit()
-    exit()
+def main():
+    from collections import Counter
 
-music_quiz()
+    # Load all songs once before showing the menu
+    with open('songs.json', 'r') as file:
+        songs = json.load(file)
+
+    if not check_network():
+        print("No network connection; exiting")
+        pygame.quit()
+        exit()
+
+    fetch_start = time.time()
+
+    # Pre-fetch all preview URLs before the quiz starts
+    prefetch_previews(songs, screen)
+
+    print(f"Preview fetch took {time.time() - fetch_start:.1f}s for {len(songs)} songs")
+
+    if len(songs) < 5:
+        print("Not enough songs in songs.json (need at least 5)")
+        exit()
+
+    # Build list of genres with enough songs
+    MIN_SONGS_PER_GENRE = 10
+    genre_counts = Counter(s.get("genre", "") for s in songs)
+    available_genres = ["Any"] + sorted(g for g, count in genre_counts.items() if count >= MIN_SONGS_PER_GENRE and g)
+
+    settings = {
+        "num_questions": 10,
+        "genre": "Any"
+    }
+
+    while True:
+        choice = main_menu(settings, songs, available_genres)
+        if choice == "start":
+            music_quiz(settings, songs)
+        elif choice == "quit":
+            pygame.quit()
+            exit()
+
+main()
